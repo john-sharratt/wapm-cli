@@ -22,6 +22,8 @@ pub struct AliasConfig {
     #[serde(default)]
     pub chroot: bool,
     #[serde(default)]
+    pub wapm: Option<String>,
+    #[serde(default)]
     pub base: Option<String>,
     #[serde(default)]
     pub mappings: Vec<String>,
@@ -36,6 +38,7 @@ pub fn save_bin_script<P: AsRef<Path>>(
 ) -> Result<(), Error> {
     let current_dir = crate::config::Config::get_current_dir().ok().unwrap_or_else(|| std::path::PathBuf::from("/".to_string()));
     let command_path = format!("/bin/{}.alias", command_name);
+    let package_path_short = package_path.clone();
     let package_path = current_dir.clone().join("wapm_packages").join(package_path).to_string_lossy().to_string();
     let module_path = current_dir.clone().join("wapm_packages").join(module_path).to_string_lossy().to_string();
     let mut file = fs::OpenOptions::new()
@@ -60,6 +63,7 @@ pub fn save_bin_script<P: AsRef<Path>>(
     let alias = AliasConfig {
         run: module_path,
         chroot: false,
+        wapm: Some(package_path_short),
         base: Some(package_path),
         mappings,
     };

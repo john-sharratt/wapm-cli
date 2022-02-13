@@ -305,6 +305,8 @@ impl<'a> Install<'a> for RegistryInstaller {
             .map_err(|err| Error::IoErrorCreatingDirectory(key.to_string(), err.to_string()))?;
         let client = {
             let builder = ClientBuilder::new().gzip(false);
+            #[cfg(target_os = "wasi")]
+            let builder = builder.cors_proxy("tokera.sh");
             #[cfg(not(target_os = "wasi"))]
             let builder = if let Some(proxy) = proxy::maybe_set_up_proxy()
                 .map_err(|e| Error::IoConnectionError(format!("{}", e)))?
